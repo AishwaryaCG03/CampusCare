@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>CampusCare</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Welcome to CampusCare</h1>
-  <a href="/register">Register</a> | <a href="/login">Login</a>
+  <div class="container">
+    <header>
+      <h1>Welcome to <span>CampusCare</span></h1>
+      <p>Your trusted platform to raise and resolve campus issues.</p>
+    </header>
+
+    <nav class="nav-links">
+      <a href="/register" class="btn">Register</a>
+      <a href="/login" class="btn btn-secondary">Login</a>
+    </nav>
+  </div>
 </body>
 </html>
