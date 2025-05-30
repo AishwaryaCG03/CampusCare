@@ -205,3 +205,48 @@ header p {
 .login-link a:hover {
   text-decoration: underline;
 }
+
+body.dashboard-body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: url('/static/doodle-bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.dashboard-container {
+  text-align: center;
+  padding-top: 0px;
+}
+
+.dashboard-title {
+  font-size: 48px;
+  color: #2a4d69;
+  margin-bottom: 60px;
+}
+
+.dashboard-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.tab-button {
+  padding: 20px 40px;
+  font-size: 18px;
+  background-color: #3c8d93;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tab-button:hover {
+  background-color: #2a6f75;
+}
+
+body.dashboard-body {
+  background: url('/static/dashboard_background.jpg') no-repeat center center fixed;
+  background-size: cover;
+}

@@ -1,21 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard - CampusCare</title>
+  <meta charset="UTF-8">
+  <title>CampusCare Dashboard</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-  <h2>Welcome, {{ username }}</h2>
-  <form method="post">
-    <textarea name="complaint" placeholder="Enter your complaint here..." required></textarea><br>
-    <button type="submit">Submit Complaint</button>
-  </form>
-  <h3>Your Complaints:</h3>
-  <ul>
-    {% for c in complaints %}
-      <li>{{ c[0] }}</li>
-    {% endfor %}
-  </ul>
-  <a href="/logout">Logout</a>
+<body class="dashboard-body">
+  <div class="dashboard-container">
+    <h1 class="dashboard-title">CampusCare</h1>
+
+    <div class="dashboard-buttons">
+      <button class="tab-button">Register Complaint</button>
+      <button class="tab-button">Show Complaints</button>
+    </div>
+  </div>
 </body>
 </html>
