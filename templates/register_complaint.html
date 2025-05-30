@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Complaint</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <script>
+        alert("{{ messages[0] }}");
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  <div class="login-container">
+    <h2>Register <span>Complaint</span></h2>
+    <form method="POST">
+      <textarea name="content" rows="5" placeholder="Describe your issue..." required style="padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Roboto', sans-serif;"></textarea>
+      <button type="submit" class="btn">Submit Complaint</button>
+    </form>
+    <br>
+    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+</body>
+</html>

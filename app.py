@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
+
 app = Flask(__name__)
 app.secret_key = "campuscare_secret"
 
@@ -59,20 +60,37 @@ def login():
             return "Invalid credentials"
     return render_template('login.html')
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard')
 def dashboard():
+    if 'user_id' not in session:
+        return redirect('/login')
+    return render_template('dashboard.html', username=session['username'])
+
+@app.route('/register_complaint', methods=['GET', 'POST'])
+def register_complaint():
+    if 'user_id' not in session:
+        return redirect('/login')
+    if request.method == 'POST':
+        content = request.form['content']
+        conn = sqlite3.connect("complaints.db")
+        c = conn.cursor()
+        c.execute("INSERT INTO complaints (user_id, content) VALUES (?, ?)", (session['user_id'], content))
+        conn.commit()
+        conn.close()
+        flash("Complaint registered successfully!")
+        return redirect('/register_complaint')
+    return render_template('register_complaint.html')
+
+@app.route('/show_complaints')
+def show_complaints():
     if 'user_id' not in session:
         return redirect('/login')
     conn = sqlite3.connect("complaints.db")
     c = conn.cursor()
-    if request.method == 'POST':
-        complaint = request.form['complaint']
-        c.execute("INSERT INTO complaints (user_id, content) VALUES (?, ?)", (session['user_id'], complaint))
-        conn.commit()
     c.execute("SELECT content FROM complaints WHERE user_id=?", (session['user_id'],))
-    complaints = c.fetchall()
+    complaints = [row[0] for row in c.fetchall()]
     conn.close()
-    return render_template('dashboard.html', username=session['username'], complaints=complaints)
+    return render_template('show_complaints.html', complaints=complaints)
 
 @app.route('/logout')
 def logout():

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Complaints</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>Your <span>Complaints</span></h2>
+    <ul style="text-align: left; padding-left: 0; list-style: none;">
+      {% for complaint in complaints %}
+        <li style="margin-bottom: 15px; padding: 15px; background-color: #f2f6fc; border-radius: 8px; border-left: 4px solid #4f9da6;">
+          {{ complaint }}
+        </li>
+      {% else %}
+        <li>No complaints found.</li>
+      {% endfor %}
+    </ul>
+    <br>
+    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+</body>
+</html>
