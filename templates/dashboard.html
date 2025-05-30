@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - CampusCare</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Welcome, {{ username }}</h2>
+  <form method="post">
+    <textarea name="complaint" placeholder="Enter your complaint here..." required></textarea><br>
+    <button type="submit">Submit Complaint</button>
+  </form>
+  <h3>Your Complaints:</h3>
+  <ul>
+    {% for c in complaints %}
+      <li>{{ c[0] }}</li>
+    {% endfor %}
+  </ul>
+  <a href="/logout">Logout</a>
+</body>
+</html>
