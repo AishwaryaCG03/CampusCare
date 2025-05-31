@@ -94,35 +94,44 @@ def register_complaint():
 def show_complaints():
     if 'user_id' not in session:
         return redirect('/login')
+
     conn = sqlite3.connect("complaints.db")
     c = conn.cursor()
-    c.execute("SELECT category, content FROM complaints WHERE user_id=?", (session['user_id'],))
-    complaints = c.fetchall()
-    conn.close()
-    return render_template('show_complaints.html', complaints=complaints)
+
+    if session['username'] == 'admin':
+        # Admin: fetch all complaints grouped by username and category
+        c.execute('''
+            SELECT users.username, complaints.category, complaints.content
+            FROM complaints
+            JOIN users ON complaints.user_id = users.id
+        ''')
+        data = c.fetchall()
+        complaints_by_user = {}
+        for username, category, content in data:
+            if username not in complaints_by_user:
+                complaints_by_user[username] = {}
+            if category not in complaints_by_user[username]:
+                complaints_by_user[username][category] = []
+            complaints_by_user[username][category].append(content)
+        conn.close()
+        return render_template('show_complaints.html', is_admin=True, complaints_by_user=complaints_by_user)
+    else:
+        # Regular user: fetch their own complaints grouped by category
+        c.execute("SELECT category, content FROM complaints WHERE user_id=?", (session['user_id'],))
+        data = c.fetchall()
+        complaints_by_category = {}
+        for category, content in data:
+            if category not in complaints_by_category:
+                complaints_by_category[category] = []
+            complaints_by_category[category].append(content)
+        conn.close()
+        return render_template('show_complaints.html', is_admin=False, complaints_by_category=complaints_by_category)
 
 @app.route('/admin')
 def admin():
     if 'username' not in session or session['username'] != 'admin':
         return redirect('/login')
-    conn = sqlite3.connect("complaints.db")
-    c = conn.cursor()
-    c.execute('''
-        SELECT complaints.id, users.id, users.username, complaints.category, complaints.content
-        FROM complaints JOIN users ON complaints.user_id = users.id
-    ''')
-    complaints = [
-        {
-            'id': row[0],
-            'user_id': row[1],
-            'username': row[2],
-            'category': row[3],
-            'content': row[4]
-        }
-        for row in c.fetchall()
-    ]
-    conn.close()
-    return render_template('admin.html', complaints=complaints)
+    return redirect('/show_complaints')
 
 @app.route('/logout')
 def logout():
@@ -132,3 +141,4 @@ def logout():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+
