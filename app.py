@@ -8,17 +8,22 @@ app.secret_key = "campuscare_secret"
 def init_db():
     conn = sqlite3.connect("complaints.db")
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS complaints (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        content TEXT NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES users(id)
-    )''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS complaints (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            category TEXT NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -55,6 +60,8 @@ def login():
         if user:
             session['user_id'] = user[0]
             session['username'] = uname
+            if uname == 'admin':
+                return redirect('/admin')
             return redirect('/dashboard')
         else:
             return "Invalid credentials"
@@ -62,7 +69,7 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session:
+    if 'user_id' not in session or session['username'] == 'admin':
         return redirect('/login')
     return render_template('dashboard.html', username=session['username'])
 
@@ -72,9 +79,11 @@ def register_complaint():
         return redirect('/login')
     if request.method == 'POST':
         content = request.form['content']
+        category = request.form['category']
         conn = sqlite3.connect("complaints.db")
         c = conn.cursor()
-        c.execute("INSERT INTO complaints (user_id, content) VALUES (?, ?)", (session['user_id'], content))
+        c.execute("INSERT INTO complaints (user_id, category, content) VALUES (?, ?, ?)",
+                  (session['user_id'], category, content))
         conn.commit()
         conn.close()
         flash("Complaint registered successfully!")
@@ -87,10 +96,33 @@ def show_complaints():
         return redirect('/login')
     conn = sqlite3.connect("complaints.db")
     c = conn.cursor()
-    c.execute("SELECT content FROM complaints WHERE user_id=?", (session['user_id'],))
-    complaints = [row[0] for row in c.fetchall()]
+    c.execute("SELECT category, content FROM complaints WHERE user_id=?", (session['user_id'],))
+    complaints = c.fetchall()
     conn.close()
     return render_template('show_complaints.html', complaints=complaints)
+
+@app.route('/admin')
+def admin():
+    if 'username' not in session or session['username'] != 'admin':
+        return redirect('/login')
+    conn = sqlite3.connect("complaints.db")
+    c = conn.cursor()
+    c.execute('''
+        SELECT complaints.id, users.id, users.username, complaints.category, complaints.content
+        FROM complaints JOIN users ON complaints.user_id = users.id
+    ''')
+    complaints = [
+        {
+            'id': row[0],
+            'user_id': row[1],
+            'username': row[2],
+            'category': row[3],
+            'content': row[4]
+        }
+        for row in c.fetchall()
+    ]
+    conn.close()
+    return render_template('admin.html', complaints=complaints)
 
 @app.route('/logout')
 def logout():

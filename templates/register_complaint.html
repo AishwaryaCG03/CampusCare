@@ -18,11 +18,22 @@
   <div class="login-container">
     <h2>Register <span>Complaint</span></h2>
     <form method="POST">
+      <label for="category">Select Category:</label>
+      <select name="category" required style="padding: 12px; border-radius: 6px; border: 1px solid #ccc; width: 100%; margin-bottom: 15px; font-family: 'Roboto', sans-serif;">
+        <option value="">-- Choose Category --</option>
+        <option value="Hostel">Hostel</option>
+        <option value="Academics">Academics</option>
+        <option value="Infrastructure">Infrastructure</option>
+        <option value="Others">Others</option>
+      </select>
+
       <textarea name="content" rows="5" placeholder="Describe your issue..." required style="padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Roboto', sans-serif;"></textarea>
+
       <button type="submit" class="btn">Submit Complaint</button>
     </form>
     <br>
     <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
   </div>
+
 </body>
 </html>

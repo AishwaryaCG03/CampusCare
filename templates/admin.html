@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h2>Welcome, Admin: {{ session['username'] }}</h2>
+    <h3>All Complaints Categorized</h3>
+    <table border="1">
+        <tr>
+            <th>Complaint ID</th>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Category</th>
+            <th>Complaint</th>
+        </tr>
+        {% for complaint in complaints %}
+        <tr>
+            <td>{{ complaint.id }}</td>
+            <td>{{ complaint.user_id }}</td>
+            <td>{{ complaint.username }}</td>
+            <td>{{ complaint.category }}</td>
+            <td>{{ complaint.content }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="/logout">Logout</a>
+</body>
+</html>

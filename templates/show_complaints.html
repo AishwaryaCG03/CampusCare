@@ -9,17 +9,28 @@
 
   <div class="login-container">
     <h2>Your <span>Complaints</span></h2>
-    <ul style="text-align: left; padding-left: 0; list-style: none;">
-      {% for complaint in complaints %}
-        <li style="margin-bottom: 15px; padding: 15px; background-color: #f2f6fc; border-radius: 8px; border-left: 4px solid #4f9da6;">
-          {{ complaint }}
-        </li>
-      {% else %}
-        <li>No complaints found.</li>
+
+    {% if complaints_by_category %}
+      {% for category, complaints in complaints_by_category.items() %}
+        <h3 style="margin-top: 25px; color: #333;">{{ category }} Complaints</h3>
+        <ul style="text-align: left; padding-left: 0; list-style: none;">
+          {% for complaint in complaints %}
+            <li style="margin-bottom: 15px; padding: 15px; background-color: #f2f6fc; border-radius: 8px; border-left: 4px solid #4f9da6;">
+              {{ complaint }}
+            </li>
+          {% endfor %}
+          {% if complaints|length == 0 %}
+            <li>No complaints in this category.</li>
+          {% endif %}
+        </ul>
       {% endfor %}
-    </ul>
+    {% else %}
+      <p>No complaints found.</p>
+    {% endif %}
+
     <br>
     <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
   </div>
+
 </body>
 </html>
