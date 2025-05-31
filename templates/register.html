@@ -1,21 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Register - CampusCare</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-</head>
-<body>
-  <div class="register-container">
-    <h2>Create Your <span>CampusCare</span> Account</h2>
-    <form method="post">
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Register</button>
-    </form>
-    <p class="login-link">Already have an account? <a href="/login">Login here</a></p>
-  </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Register - CampusCare{% endblock %}
+
+{% block content %}
+<div class="register-container">
+  <h2>Create Your <span>CampusCare</span> Account</h2>
+  <form method="post">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <select name="role" required>
+      <option value="student">Student</option>
+      <option value="faculty">Faculty</option>
+      <option value="non_teaching">Non-Teaching Staff</option>
+      <option value="worker">Worker</option>
+    </select>
+    <button type="submit">Register</button>
+  </form>
+  <p class="login-link">Already have an account? <a href="/login">Login here</a></p>
+</div>
+{% endblock %}
 
