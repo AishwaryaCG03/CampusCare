@@ -8,6 +8,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body class="{% block body_class %}{% endblock %}">
+
+  <!-- Global Navbar -->
+  <nav>
+    <a href="/">Home</a>
+    {% if not session.get('username') %}
+      <a href="/login">Login</a>
+    {% endif %}
+    {% if session.get('role') == 'admin' %}
+      <a href="/admin">Admin Panel</a>
+    {% endif %}
+    {% if session.get('username') %}
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    {% endif %}
+  </nav>
+
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
