@@ -393,31 +393,60 @@ body.complaints-body::before {
 }
 
 .category {
-  background: #4f9da6;
-  color: white;
+  background: #4f9da6; /* or any default background */
+  color: white !important;  /* ensures white text */
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+  margin-right: 10px;
 }
 
+
+/* Category-specific background colors */
+.category.academics {
+  background-color: #1e88e5;
+  color: white;
+}
+.category.hostel {
+  background-color: #6a1b9a;
+  color: white;
+}
+.category.infrastructure {
+  background-color: #43a047;
+  color: white;
+}
+.category.others {
+  background-color: #ff8f00;
+  color: white;
+}
+
+/* Status styling (already in your code, just showing for completeness) */
 .status {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 14px;
-  color: white;
+  font-weight: 500;
+  color: white !important;
+  text-transform: capitalize;
+  display: inline-block;
 }
 
 .status.pending {
   background: #FFA500;
+  color: white;
 }
-
 .status.in-progress {
   background: #1E90FF;
+  color: white;
 }
-
 .status.resolved {
   background: #32CD32;
+  color: white;
 }
+
 
 .date {
   margin-left: auto;

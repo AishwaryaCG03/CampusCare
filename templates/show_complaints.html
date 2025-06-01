@@ -1,49 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Your Complaints - CampusCare</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body class="complaints-body">
-  {% extends "base.html" %}
-  {% block title %}Your Complaints - CampusCare{% endblock %}
-  {% block body_class %}complaints-body{% endblock %}
+{% extends "base.html" %}
+{% block title %}Your Complaints - CampusCare{% endblock %}
+{% block body_class %}complaints-body{% endblock %}
 
-  {% block content %}
-  <div class="login-container">
-    <h2>Your <span>Complaints</span></h2>
+{% block content %}
+<div class="login-container">
+  <h2>Your <span>Complaints</span></h2>
+  
+  <!-- Search and Filter Form -->
+  <form method="get" action="/show_complaints" class="search-filter">
+    <input type="text" name="q" placeholder="Search complaints..." value="{{ search_query }}">
     
-    <!-- Search and Filter Form -->
-    <form method="get" action="/show_complaints" class="search-filter">
-      <input type="text" name="q" placeholder="Search complaints..." value="{{ search_query }}">
-      
-      <select name="category">
-        <option value="">All Categories</option>
-        {% for category in categories %}
-          <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
-            {{ category }}
-          </option>
-        {% endfor %}
-      </select>
-      
-      <select name="status">
-        <option value="">All Statuses</option>
-        <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
-        <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
-        <option value="Resolved" {% if selected_status == 'Resolved' %}selected{% endif %}>Resolved</option>
-      </select>
-      
-      <button type="submit" class="btn">Apply Filters</button>
-    </form>
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
+          {{ category }}
+        </option>
+      {% endfor %}
+    </select>
+    
+    <select name="status">
+      <option value="">All Statuses</option>
+      <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
+      <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+      <option value="Resolved" {% if selected_status == 'Resolved' %}selected{% endif %}>Resolved</option>
+    </select>
+    
+    <button type="submit" class="btn">Apply Filters</button>
+  </form>
 
-    <!-- Unified Complaints List -->
-    <div class="complaints-list">
-      {% if complaints %}
-        {% for complaint in complaints %}
+  <!-- Complaints List -->
+  <div class="complaints-list">
+    {% if complaints %}
+      {% for complaint in complaints %}
+        {% if complaint[2] %}  <!-- Only render if content exists -->
           <div class="complaint-card">
             <div class="complaint-header">
-              <span class="category">{{ complaint[1] }}</span>
+              <span class="category {{ complaint[1]|lower }}">{{ complaint[1] }}</span>
               <span class="status {{ complaint[3].lower().replace(' ', '-') }}">
                 {{ complaint[3] }}
               </span>
@@ -63,14 +56,13 @@
               {% endif %}
             </div>
           </div>
-        {% endfor %}
-      {% else %}
-        <p class="no-results">No complaints found.</p>
-      {% endif %}
-    </div>
-    
-    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p class="no-results">No complaints found.</p>
+    {% endif %}
   </div>
-  {% endblock %}
-</body>
-</html>
+  
+  <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}
