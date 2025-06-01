@@ -1,40 +1,141 @@
 {% extends "base.html" %}
+
 {% block title %}Dashboard - CampusCare{% endblock %}
 {% block body_class %}dashboard-body{% endblock %}
 
 {% block content %}
-  <div style="position: absolute; top: 20px; left: 20px;">
-    <a href="/logout" class="btn btn-secondary">Logout</a>
+<style>
+  .dashboard-container {
+    max-width: 900px;
+    margin: 60px auto 40px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .dashboard-title {
+    text-align: center;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #34495e;
+  }
+
+  h2 span {
+    color: #2980b9;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 220px;
+    text-align: center;
+  }
+
+  .stat-card h3 {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #34495e;
+    font-size: 1.2rem;
+  }
+
+  .stat-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #27ae60;
+    margin: 0;
+  }
+
+  .dashboard-buttons {
+    text-align: center;
+  }
+
+  .dashboard-buttons .btn {
+    background-color: #2980b9;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 0 12px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+
+  .dashboard-buttons .btn:hover {
+    background-color: #1c5980;
+  }
+
+  .btn-secondary {
+    background-color: #7f8c8d !important;
+  }
+
+  .btn-secondary:hover {
+    background-color: #56606a !important;
+  }
+
+  /* Logout button */
+  div[style*="position: absolute"] .btn {
+    padding: 8px 18px;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div style="position: absolute; top: 20px; left: 20px;">
+  <a href="/logout" class="btn btn-secondary">Logout</a>
+</div>
+
+<div class="dashboard-container">
+  <h1 class="dashboard-title">CampusCare</h1>
+
+  <h2>Welcome, <span>{{ username | default('User') }}</span></h2>
+
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Total Complaints</h3>
+      <p>{{ total_complaints | default(0) }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Resolved</h3>
+      <p>{{ resolved_complaints | default(0) }}</p>
+    </div>
+    {% if role == 'admin' %}
+    <div class="stat-card">
+      <h3>Resolution Rate</h3>
+      <p>
+        {% set total = total_complaints | default(0) %}
+        {% set resolved = resolved_complaints | default(0) %}
+        {{ ((resolved / total) * 100) if total > 0 else 0 | round(1) }}%
+      </p>
+    </div>
+    {% endif %}
   </div>
 
-  <div class="dashboard-container">
-    <h1 class="dashboard-title">CampusCare</h1>
-
-    <h2>Welcome, <span>{{ username }}</span></h2>
-    
-    <div class="stats">
-      <div class="stat-card">
-        <h3>Total Complaints</h3>
-        <p>{{ total_complaints }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Resolved</h3>
-        <p>{{ resolved_complaints }}</p>
-      </div>
-      {% if role == 'admin' %}
-      <div class="stat-card">
-        <h3>Resolution Rate</h3>
-        <p>{{ (resolved_complaints / total_complaints * 100 if total_complaints > 0 else 0) | round(1) }}%</p>
-      </div>
-      {% endif %}
-    </div>
-
-    <div class="dashboard-buttons">
-      <a href="/register_complaint" class="btn">Register Complaint</a>
-      <a href="/show_complaints" class="btn">View Complaints</a>
-      {% if role == 'admin' %}
-      <a href="/admin" class="btn btn-secondary">Admin Panel</a>
-      {% endif %}
-    </div>
+  <div class="dashboard-buttons">
+    <a href="/register_complaint" class="btn">Register Complaint</a>
+    <a href="/show_complaints" class="btn">View Complaints</a>
+    {% if role == 'admin' %}
+    <a href="/admin" class="btn btn-secondary">Admin Panel</a>
+    {% endif %}
   </div>
+</div>
 {% endblock %}
