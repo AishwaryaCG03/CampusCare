@@ -77,6 +77,8 @@ def login():
             flash('Invalid credentials!', 'error')
     return render_template('login.html')
 
+
+
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
