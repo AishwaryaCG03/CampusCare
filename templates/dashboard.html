@@ -2,52 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CampusCare Dashboard</title>
+  <title>Dashboard - CampusCare</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="dashboard-body">
+
+ 
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <a href="/logout" class="btn btn-secondary">Logout</a>
+  </div>
+
+  {% extends "base.html" %}
+  {% block title %}Dashboard - CampusCare{% endblock %}
+  {% block body_class %}dashboard-body{% endblock %}
+
+  {% block content %}
   <div class="dashboard-container">
     <h1 class="dashboard-title">CampusCare</h1>
 
+    <h2>Welcome, <span>{{ username }}</span></h2>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <h3>Total Complaints</h3>
+        <p>{{ total_complaints }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Resolved</h3>
+        <p>{{ resolved_complaints }}</p>
+      </div>
+      {% if role == 'admin' %}
+      <div class="stat-card">
+        <h3>Resolution Rate</h3>
+        <p>{{ (resolved_complaints / total_complaints * 100 if total_complaints > 0 else 0)|round(1) }}%</p>
+      </div>
+      {% endif %}
+    </div>
+
     <div class="dashboard-buttons">
-  <a href="/register_complaint"><button class="tab-button">Register Complaint</button></a>
-  <a href="/show_complaints"><button class="tab-button">Show Complaints</button></a>
-</div>
-
-  </div>
-  {% extends "base.html" %}
-{% block title %}Dashboard - CampusCare{% endblock %}
-{% block body_class %}dashboard-body{% endblock %}
-
-{% block content %}
-<div class="dashboard-container">
-  <h1>Welcome, <span>{{ username }}</span></h1>
-  
-  <div class="stats">
-    <div class="stat-card">
-      <h3>Total Complaints</h3>
-      <p>{{ total_complaints }}</p>
+      <a href="/register_complaint" class="btn">Register Complaint</a>
+      <a href="/show_complaints" class="btn">View Complaints</a>
+      {% if role == 'admin' %}
+      <a href="/admin" class="btn btn-secondary">Admin Panel</a>
+      {% endif %}
     </div>
-    <div class="stat-card">
-      <h3>Resolved</h3>
-      <p>{{ resolved_complaints }}</p>
-    </div>
-    {% if role == 'admin' %}
-    <div class="stat-card">
-      <h3>Resolution Rate</h3>
-      <p>{{ (resolved_complaints / total_complaints * 100 if total_complaints > 0 else 0)|round(1) }}%</p>
-    </div>
-    {% endif %}
   </div>
-
-  <div class="dashboard-buttons">
-    <a href="/register_complaint" class="btn">Register Complaint</a>
-    <a href="/show_complaints" class="btn">View Complaints</a>
-    {% if role == 'admin' %}
-    <a href="/admin" class="btn btn-secondary">Admin Panel</a>
-    {% endif %}
-  </div>
-</div>
-{% endblock %}
+  {% endblock %}
 </body>
 </html>
