@@ -137,11 +137,11 @@
     <button type="submit" class="btn">Generate Credentials</button>
   </form>
 
-  {% if credentials %}
+  {% if new_user_data %}
   <div class="credentials-box">
     <p><strong>Generated Credentials:</strong></p>
-    <p>Username: <code>{{ credentials.username }}</code></p>
-    <p>Password: <code>{{ credentials.password }}</code></p>
+    <p>Username: <code>{{ new_user_data.username }}</code></p>
+    <p>Password: <code>{{ new_user_data.password }}</code></p>
   </div>
   {% endif %}
 

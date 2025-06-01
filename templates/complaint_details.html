@@ -5,51 +5,52 @@
 {% block content %}
 <div class="container">
   <h2>Complaint <span>Details</span></h2>
-  
+
   <div class="complaint-detail">
     <div class="detail-row">
       <span class="label">ID:</span>
       <span class="value">{{ complaint[0] }}</span>
     </div>
-    
+
     {% if role == 'admin' %}
     <div class="detail-row">
       <span class="label">Submitted By:</span>
       <span class="value">{{ complaint[6] }}</span>
     </div>
     {% endif %}
-    
+
     <div class="detail-row">
       <span class="label">Category:</span>
       <span class="value">{{ complaint[1] }}</span>
     </div>
-    
+
     <div class="detail-row">
       <span class="label">Status:</span>
       <span class="value status {{ complaint[3].lower().replace(' ', '-') }}">
         {{ complaint[3] }}
       </span>
     </div>
-    
+
     <div class="detail-row">
       <span class="label">Submitted On:</span>
       <span class="value">{{ complaint[4] }}</span>
     </div>
-    
+
     {% if complaint[3] == 'Resolved' and complaint[5] %}
     <div class="detail-row">
       <span class="label">Resolved On:</span>
       <span class="value">{{ complaint[5] }}</span>
     </div>
     {% endif %}
-    
+
     <div class="detail-content">
       <h3>Description</h3>
       <p>{{ complaint[2] }}</p>
     </div>
-    
+
     {% if role in ['admin', 'faculty'] %}
     <form method="post" class="status-form">
+      {# Include CSRF token here if you use Flask-WTF: {{ form.csrf_token }} #}
       <label for="status">Update Status:</label>
       <select name="status" id="status" onchange="this.form.submit()">
         <option value="Pending" {% if complaint[3] == 'Pending' %}selected{% endif %}>Pending</option>
@@ -59,7 +60,7 @@
     </form>
     {% endif %}
   </div>
-  
-  <a href="/show_complaints" class="btn btn-secondary">Back to Complaints</a>
+
+  <a href="{{ url_for('show_complaints') }}" class="btn btn-secondary">Back to Complaints</a>
 </div>
 {% endblock %}

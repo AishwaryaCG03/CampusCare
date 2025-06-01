@@ -1,76 +1,228 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Your Complaints - CampusCare</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body class="complaints-body">
-  {% extends "base.html" %}
-  {% block title %}Your Complaints - CampusCare{% endblock %}
-  {% block body_class %}complaints-body{% endblock %}
+{% extends "base.html" %}
 
-  {% block content %}
-  <div class="login-container">
-    <h2>Your <span>Complaints</span></h2>
+{% block title %}Your Complaints - CampusCare{% endblock %}
+{% block body_class %}complaints-body{% endblock %}
+
+{% block content %}
+<style>
+  .login-container {
+    max-width: 1000px;
+    margin: 60px auto 40px;
+    padding: 25px 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .login-container h2 {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-size: 2rem;
+  }
+
+  .login-container h2 span {
+    color: #2980b9;
+  }
+
+  .search-filter {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+
+  .search-filter input,
+  .search-filter select {
+    padding: 10px 14px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1.5px solid #bdc3c7;
+    width: 200px;
+  }
+
+  .search-filter .btn {
+    padding: 10px 18px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-filter .btn:hover {
+    background-color: #1c5980;
+  }
+
+  .complaints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .complaint-card {
+    background: white;
+    border-left: 5px solid #2980b9;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  .complaint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .complaint-header .category {
+    color: #34495e;
+  }
+
+  .complaint-header .status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .complaint-header .status.pending {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .complaint-header .status.in-progress {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .complaint-header .status.resolved {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .complaint-header .date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  .content {
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+
+  .btn-small:hover {
+    background-color: #217dbb;
+  }
+
+  .status-form select {
+    padding: 6px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+
+  .no-results {
+    text-align: center;
+    color: #888;
+    font-size: 1.1rem;
+    margin-top: 30px;
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 10px 20px;
+    background-color: #7f8c8d;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: #56606a;
+  }
+</style>
+
+<div class="login-container">
+  <h2>Your <span>Complaints</span></h2>
+
+  <!-- Search and Filter Form -->
+  <form method="get" action="/show_complaints" class="search-filter">
+    <input type="text" name="q" placeholder="Search complaints..." value="{{ search_query }}">
     
-    <!-- Search and Filter Form -->
-    <form method="get" action="/show_complaints" class="search-filter">
-      <input type="text" name="q" placeholder="Search complaints..." value="{{ search_query }}">
-      
-      <select name="category">
-        <option value="">All Categories</option>
-        {% for category in categories %}
-          <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
-            {{ category }}
-          </option>
-        {% endfor %}
-      </select>
-      
-      <select name="status">
-        <option value="">All Statuses</option>
-        <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
-        <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
-        <option value="Resolved" {% if selected_status == 'Resolved' %}selected{% endif %}>Resolved</option>
-      </select>
-      
-      <button type="submit" class="btn">Apply Filters</button>
-    </form>
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
+          {{ category }}
+        </option>
+      {% endfor %}
+    </select>
+    
+    <select name="status">
+      <option value="">All Statuses</option>
+      <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
+      <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+      <option value="Resolved" {% if selected_status == 'Resolved' %}selected{% endif %}>Resolved</option>
+    </select>
+    
+    <button type="submit" class="btn">Apply Filters</button>
+  </form>
 
-    <!-- Unified Complaints List -->
-    <div class="complaints-list">
-      {% if complaints %}
-        {% for complaint in complaints %}
-          <div class="complaint-card">
-            <div class="complaint-header">
-              <span class="category">{{ complaint[1] }}</span>
-              <span class="status {{ complaint[3].lower().replace(' ', '-') }}">
-                {{ complaint[3] }}
-              </span>
-              <small class="date">{{ complaint[4] }}</small>
-            </div>
-            <p class="content">{{ complaint[2] }}</p>
-            <div class="actions">
-              <a href="/complaint/{{ complaint[0] }}" class="btn btn-small">View Details</a>
-              {% if role in ['admin', 'faculty'] %}
-                <form action="/complaint/{{ complaint[0] }}" method="post" class="status-form">
-                  <select name="status" onchange="this.form.submit()">
-                    <option value="Pending" {% if complaint[3] == 'Pending' %}selected{% endif %}>Pending</option>
-                    <option value="In Progress" {% if complaint[3] == 'In Progress' %}selected{% endif %}>In Progress</option>
-                    <option value="Resolved" {% if complaint[3] == 'Resolved' %}selected{% endif %}>Resolved</option>
-                  </select>
-                </form>
-              {% endif %}
-            </div>
+  <!-- Unified Complaints List -->
+  <div class="complaints-list">
+    {% if complaints %}
+      {% for complaint in complaints %}
+        <div class="complaint-card">
+          <div class="complaint-header">
+            <span class="category">{{ complaint[1] }}</span>
+            <span class="status {{ complaint[3]|lower|replace(' ', '-') }}">{{ complaint[3] }}</span>
+            <small class="date">{{ complaint[4] }}</small>
           </div>
-        {% endfor %}
-      {% else %}
-        <p class="no-results">No complaints found.</p>
-      {% endif %}
-    </div>
-    
-    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+          <p class="content">{{ complaint[2] }}</p>
+          <div class="actions">
+            <a href="/complaint/{{ complaint[0] }}" class="btn-small">View Details</a>
+            {% if role in ['admin', 'faculty'] %}
+              <form action="/complaint/{{ complaint[0] }}" method="post" class="status-form">
+                <select name="status" onchange="this.form.submit()">
+                  <option value="Pending" {% if complaint[3] == 'Pending' %}selected{% endif %}>Pending</option>
+                  <option value="In Progress" {% if complaint[3] == 'In Progress' %}selected{% endif %}>In Progress</option>
+                  <option value="Resolved" {% if complaint[3] == 'Resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="no-results">No complaints found.</p>
+    {% endif %}
   </div>
-  {% endblock %}
-</body>
-</html>
+
+  <a href="/dashboard" class="btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -76,7 +76,7 @@
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
-    margin: 0 12px;
+    margin: 0 12px 12px 12px;
     display: inline-block;
     transition: background-color 0.3s ease;
   }
@@ -93,7 +93,6 @@
     background-color: #56606a !important;
   }
 
-  /* Logout button */
   div[style*="position: absolute"] .btn {
     padding: 8px 18px;
     font-size: 0.9rem;
@@ -101,7 +100,7 @@
 </style>
 
 <div style="position: absolute; top: 20px; left: 20px;">
-  <a href="/logout" class="btn btn-secondary">Logout</a>
+  <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
 </div>
 
 <div class="dashboard-container">
@@ -124,17 +123,21 @@
       <p>
         {% set total = total_complaints | default(0) %}
         {% set resolved = resolved_complaints | default(0) %}
-        {{ ((resolved / total) * 100) if total > 0 else 0 | round(1) }}%
+        {{ ((resolved / total) * 100) | round(1) if total > 0 else 0 }}%
       </p>
     </div>
     {% endif %}
   </div>
 
   <div class="dashboard-buttons">
-    <a href="/register_complaint" class="btn">Register Complaint</a>
-    <a href="/show_complaints" class="btn">View Complaints</a>
+    {% if role != 'admin' %}
+      <a href="{{ url_for('register_complaint') }}" class="btn">Register Complaint</a>
+    {% endif %}
+    <a href="{{ url_for('show_complaints') }}" class="btn">
+      {% if role == 'admin' %}View All Complaints{% else %}My Complaints{% endif %}
+    </a>
     {% if role == 'admin' %}
-    <a href="/admin" class="btn btn-secondary">Admin Panel</a>
+      <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Admin Panel</a>
     {% endif %}
   </div>
 </div>
