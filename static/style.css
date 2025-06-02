@@ -541,3 +541,28 @@ body.complaints-body::before {
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
 }
+/* File upload styling */
+.file-upload {
+    margin: 20px 0;
+}
+.file-upload input[type="file"] {
+    display: none;
+}
+.file-upload label {
+    display: block;
+    padding: 12px;
+    background: #4f9da6;
+    color: white;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.file-upload label:hover {
+    background: #3e7b88;
+}
+.file-upload .file-name {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
