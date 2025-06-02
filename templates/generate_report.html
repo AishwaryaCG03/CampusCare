@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="login-container">
+    <h2>Generate <span>Report</span></h2>
+    <form method="post">
+        <div class="form-group">
+            <label>Report Type:</label>
+            <select name="report_type" class="form-control" onchange="toggleCategory(this.value)">
+                <option value="ALL">All Complaints</option>
+                <option value="PENDING">Pending Complaints</option>
+                <option value="RESOLVED">Resolved Complaints</option>
+                <option value="CATEGORY">By Category</option>
+            </select>
+        </div>
+        
+        <div id="categoryField" class="form-group" style="display:none;">
+            <label>Category:</label>
+            <select name="category" class="form-control">
+                {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Format:</label>
+            <select name="format" class="form-control">
+                <option value="PDF">PDF</option>
+                <option value="EXCEL">Excel</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn">Generate Report</button>
+    </form>
+</div>
+
+<script>
+function toggleCategory(value) {
+    document.getElementById('categoryField').style.display = 
+        value === 'CATEGORY' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
