@@ -1,30 +1,154 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <h2>Welcome, Admin: {{ session['username'] }}</h2>
-    <h3>All Complaints Categorized</h3>
-    <table border="1">
-        <tr>
-            <th>Complaint ID</th>
-            <th>User ID</th>
-            <th>Username</th>
-            <th>Category</th>
-            <th>Complaint</th>
-        </tr>
-        {% for complaint in complaints %}
-        <tr>
-            <td>{{ complaint.id }}</td>
-            <td>{{ complaint.user_id }}</td>
-            <td>{{ complaint.username }}</td>
-            <td>{{ complaint.category }}</td>
-            <td>{{ complaint.content }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br>
-    <a href="/logout">Logout</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - CampusCare{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+
+{% block content %}
+<style>
+  .admin-container {
+    max-width: 500px;
+    margin: 60px auto 40px;
+    padding: 25px 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .admin-container h1 {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-size: 2rem;
+  }
+
+  .flash-message {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .flash-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .flash-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  form.generate-user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  form.generate-user-form label {
+    font-weight: 600;
+    color: #34495e;
+  }
+
+  form.generate-user-form input[type="email"] {
+    padding: 10px 14px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1.5px solid #bdc3c7;
+    transition: border-color 0.3s ease;
+  }
+
+  form.generate-user-form input[type="email"]:focus {
+    border-color: #2980b9;
+    outline: none;
+  }
+
+  form.generate-user-form button.btn {
+    background-color: #2980b9;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  form.generate-user-form button.btn:hover {
+    background-color: #1c5980;
+  }
+
+  hr {
+    margin: 30px 0;
+    border: none;
+    border-top: 1.5px solid #ddd;
+  }
+
+  .admin-actions {
+    text-align: center;
+  }
+
+  .admin-actions a.btn {
+    background-color: #27ae60;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+
+  .admin-actions a.btn:hover {
+    background-color: #1e8449;
+  }
+
+  .credentials-box {
+    background: #eef9f1;
+    border: 1.5px solid #27ae60;
+    padding: 15px 20px;
+    margin-top: 25px;
+    border-radius: 8px;
+    font-family: monospace, monospace;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+  }
+</style>
+
+<div class="admin-container">
+  <h1>Admin Panel</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form action="/admin" method="POST" class="generate-user-form">
+    <label for="email">Enter User Email:</label>
+    <input type="email" id="email" name="email" placeholder="user@example.com" required>
+    <button type="submit" class="btn">Generate Credentials</button>
+  </form>
+
+  {% if new_user_data %}
+  <div class="credentials-box">
+    <p><strong>Generated Credentials:</strong></p>
+    <p>Username: <code>{{ new_user_data.username }}</code></p>
+    <p>Password: <code>{{ new_user_data.password }}</code></p>
+  </div>
+  {% endif %}
+
+  <hr>
+
+  <div class="admin-actions">
+    <a href="/show_complaints" class="btn">View All Complaints</a>
+  </div>
+</div>
+{% endblock %}

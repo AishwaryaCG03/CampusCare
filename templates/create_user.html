@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Create User{% endblock %}
+{% block content %}
+  <h2>Create New User</h2>
+  <form method="POST">
+    <label>Email Address:</label>
+    <input type="email" name="email" required>
+    <button type="submit">Generate Credentials</button>
+  </form>
+{% endblock %}
