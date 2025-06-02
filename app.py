@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, session, flash
-import sqlite3
+from flask import Flask, render_template, request, redirect, session, flash, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
+<<<<<<< HEAD
 import random
 import string
 import smtplib
@@ -10,6 +10,16 @@ import os
 
 # Load environment variables
 load_dotenv()
+=======
+from werkzeug.utils import secure_filename
+from datetime import datetime
+import sqlite3
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from openpyxl import Workbook
+import os
+from flask_apscheduler import APScheduler
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")  # fallback secret key for dev
@@ -18,6 +28,24 @@ DB_PATH = "complaints.db"
 
 # ---------------------- Database Initialization ----------------------
 
+<<<<<<< HEAD
+=======
+# Configure upload settings
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+
+# Initialize scheduler
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+# Initialize DB
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -43,6 +71,7 @@ def init_db():
             status TEXT DEFAULT 'Pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             resolved_at TIMESTAMP,
+            evidence TEXT,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
@@ -204,9 +233,22 @@ def register_complaint():
         flash("Please log in to register a complaint.", "error")
         return redirect('/login')
 
+<<<<<<< HEAD
     if session.get('role') == 'admin':
         flash("Admins cannot register complaints.", "error")
         return redirect('/admin')
+=======
+    if request.method == 'POST':
+        content = request.form['content']
+        category = request.form['category']
+        
+        # Handle file upload
+        file = request.files.get('evidence')
+        filename = None
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"{session['user_id']}_{datetime.now().timestamp()}.{file.filename.rsplit('.', 1)[1].lower()}")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
 
     if request.method == 'POST':
         category = request.form.get('category')
@@ -218,8 +260,8 @@ def register_complaint():
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("INSERT INTO complaints (user_id, username, category, content) VALUES (?, ?, ?, ?)",
-                  (session['user_id'], session['username'], category, content))
+        c.execute("INSERT INTO complaints (user_id, username, category, content, evidence) VALUES (?, ?, ?, ?, ?)",
+                  (session['user_id'], session['username'], category, content, filename))
         conn.commit()
         conn.close()
 
@@ -245,8 +287,42 @@ def show_complaints():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
+<<<<<<< HEAD
     # Get distinct categories for filter dropdown
     c.execute("SELECT DISTINCT category FROM complaints")
+=======
+    query = '''
+        SELECT id, category, content, status, created_at, resolved_at, evidence
+        FROM complaints
+        WHERE 1=1
+    '''
+    params = []
+
+    if session['role'] != 'admin':
+        query += " AND user_id = ?"
+        params.append(session['user_id'])
+
+    if search_query:
+        query += " AND (content LIKE ? OR category LIKE ?)"
+        params.extend([f'%{search_query}%', f'%{search_query}%'])
+
+    if category_filter:
+        query += " AND category = ?"
+        params.append(category_filter)
+
+    if status_filter:
+        query += " AND status = ?"
+        params.append(status_filter)
+
+    query += " ORDER BY created_at DESC"
+    c.execute(query, params)
+    complaints = c.fetchall()
+
+    if session['role'] == 'admin':
+        c.execute("SELECT DISTINCT category FROM complaints")
+    else:
+        c.execute("SELECT DISTINCT category FROM complaints WHERE user_id=?", (session['user_id'],))
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
     categories = [row[0] for row in c.fetchall()]
 
     # Build query based on role and filters
@@ -330,7 +406,162 @@ def complaint_details(complaint_id):
 
     conn.close()
 
+<<<<<<< HEAD
     return render_template('complaint_details.html', complaint=complaint, role=role)
+=======
+@app.route('/generate_report', methods=['GET', 'POST'])
+def generate_report():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect('/login')
+
+    if request.method == 'POST':
+        report_type = request.form.get('report_type')
+        format_type = request.form.get('format')
+
+        conn = sqlite3.connect("complaints.db")
+        c = conn.cursor()
+
+        query = "SELECT * FROM complaints"
+        if report_type == 'PENDING':
+            query += " WHERE status='Pending'"
+        elif report_type == 'RESOLVED':
+            query += " WHERE status='Resolved'"
+        elif report_type == 'CATEGORY':
+            category = request.form.get('category')
+            query += f" WHERE category='{category}'"
+
+        c.execute(query)
+        complaints = c.fetchall()
+        conn.close()
+
+        if format_type == 'PDF':
+            return generate_pdf_report(complaints, report_type)
+        else:
+            return generate_excel_report(complaints, report_type)
+
+    conn = sqlite3.connect("complaints.db")
+    c = conn.cursor()
+    c.execute("SELECT DISTINCT category FROM complaints")
+    categories = [row[0] for row in c.fetchall()]
+    conn.close()
+
+    return render_template('generate_report.html', categories=categories)
+
+def generate_pdf_report(complaints, report_type):
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer)
+
+    # PDF Header
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 800, f"CampusCare {report_type} Report")
+    p.drawString(100, 780, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+
+    # PDF Content
+    y = 750
+    p.setFont("Helvetica", 12)
+    for complaint in complaints:
+        p.drawString(100, y, f"ID: {complaint[0]} | Category: {complaint[3]}")
+        p.drawString(100, y-20, f"Status: {complaint[5]} | Created: {complaint[6].split()[0]}")
+        p.drawString(100, y-40, f"Description: {complaint[4][:100]}...")
+        y -= 80
+        if y < 100:
+            p.showPage()
+            y = 800
+
+    p.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"{report_type}_report_{datetime.now().date()}.pdf",
+        mimetype='application/pdf'
+    )
+
+def generate_excel_report(complaints, report_type):
+    buffer = BytesIO()
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = report_type
+
+    # Excel Header
+    headers = ['ID', 'Username', 'Category', 'Content', 'Status', 'Created At', 'Resolved At', 'Evidence']
+    worksheet.append(headers)
+
+    # Excel Content
+    for complaint in complaints:
+        worksheet.append([
+            complaint[0],  # ID
+            complaint[2],  # Username
+            complaint[3],  # Category
+            complaint[4],  # Content
+            complaint[5],  # Status
+            complaint[6],  # Created At
+            complaint[7] if complaint[7] else '',  # Resolved At
+            complaint[8] if complaint[8] else ''   # Evidence
+        ])
+
+    workbook.save(buffer)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"{report_type}_report_{datetime.now().date()}.xlsx",
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+# Scheduled Reports
+@scheduler.task('cron', id='daily_report', day_of_week='*', hour=8)
+def generate_daily_report():
+    with app.app_context():
+        conn = sqlite3.connect("complaints.db")
+        c = conn.cursor()
+        c.execute("SELECT * FROM complaints WHERE date(created_at) = date('now', '-1 day')")
+        complaints = c.fetchall()
+        conn.close()
+
+        if complaints:
+            buffer = BytesIO()
+            workbook = Workbook()
+            worksheet = workbook.active
+            worksheet.title = "Daily Report"
+            
+            headers = ['ID', 'Username', 'Category', 'Content', 'Status']
+            worksheet.append(headers)
+            
+            for complaint in complaints:
+                worksheet.append([complaint[0], complaint[2], complaint[3], complaint[4], complaint[5]])
+            
+            workbook.save(buffer)
+            buffer.seek(0)
+            
+            # Save to reports directory
+            if not os.path.exists('reports'):
+                os.makedirs('reports')
+            with open(f"reports/daily_report_{datetime.now().date()}.xlsx", "wb") as f:
+                f.write(buffer.getvalue())
+
+@app.route('/admin')
+def admin():
+    if 'username' not in session or session['role'] != 'admin':
+        flash("Admin access only!", "error")
+        return redirect('/login')
+    
+    conn = sqlite3.connect("complaints.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM complaints ORDER BY created_at DESC")
+    complaints = c.fetchall()
+    conn.close()
+    
+    return render_template('admin.html', 
+                         username=session['username'],
+                         complaints=complaints)
+
+@app.route('/search')
+def search_complaints():
+    return redirect('/show_complaints?q=' + request.args.get('q', ''))
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
 
 @app.route('/logout')
 def logout():
@@ -341,5 +572,11 @@ def logout():
 # ---------------------- Run App ----------------------
 
 if __name__ == '__main__':
+    # Create necessary directories
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+    if not os.path.exists('reports'):
+        os.makedirs('reports')
+    
     init_db()
     app.run(debug=True)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+<<<<<<< HEAD
 
 {% block title %}Your Complaints - CampusCare{% endblock %}
 {% block body_class %}complaints-body{% endblock %}
@@ -170,6 +171,15 @@
 <div class="login-container">
   <h2>Your <span>Complaints</span></h2>
 
+=======
+{% block title %}Your Complaints - CampusCare{% endblock %}
+{% block body_class %}complaints-body{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <h2>Your <span>Complaints</span></h2>
+  
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
   <!-- Search and Filter Form -->
   <form method="get" action="/show_complaints" class="search-filter">
     <input type="text" name="q" placeholder="Search complaints..." value="{{ search_query }}">
@@ -193,6 +203,7 @@
     <button type="submit" class="btn">Apply Filters</button>
   </form>
 
+<<<<<<< HEAD
   <!-- Unified Complaints List -->
   <div class="complaints-list">
     {% if complaints %}
@@ -217,12 +228,47 @@
             {% endif %}
           </div>
         </div>
+=======
+  <!-- Complaints List -->
+  <div class="complaints-list">
+    {% if complaints %}
+      {% for complaint in complaints %}
+        {% if complaint[2] %}  <!-- Only render if content exists -->
+          <div class="complaint-card">
+            <div class="complaint-header">
+              <span class="category {{ complaint[1]|lower }}">{{ complaint[1] }}</span>
+              <span class="status {{ complaint[3].lower().replace(' ', '-') }}">
+                {{ complaint[3] }}
+              </span>
+              <small class="date">{{ complaint[4] }}</small>
+            </div>
+            <p class="content">{{ complaint[2] }}</p>
+            <div class="actions">
+              <a href="/complaint/{{ complaint[0] }}" class="btn btn-small">View Details</a>
+              {% if role in ['admin', 'faculty'] %}
+                <form action="/complaint/{{ complaint[0] }}" method="post" class="status-form">
+                  <select name="status" onchange="this.form.submit()">
+                    <option value="Pending" {% if complaint[3] == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="In Progress" {% if complaint[3] == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Resolved" {% if complaint[3] == 'Resolved' %}selected{% endif %}>Resolved</option>
+                  </select>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
       {% endfor %}
     {% else %}
       <p class="no-results">No complaints found.</p>
     {% endif %}
   </div>
+<<<<<<< HEAD
 
   <a href="/dashboard" class="btn-secondary">Back to Dashboard</a>
+=======
+  
+  <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+>>>>>>> 645cc75e5250671c3ce8f969e12d8fcbe748ed44
 </div>
 {% endblock %}
